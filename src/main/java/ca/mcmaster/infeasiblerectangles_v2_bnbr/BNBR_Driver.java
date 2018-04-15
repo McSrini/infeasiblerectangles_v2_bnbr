@@ -13,6 +13,7 @@ import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Parameters.MIP_FILENAME;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.collection.Analytic_RectangleCollector;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.common.*;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.common.Objective;
+import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.analytic.BNBR_Solver;
 import ilog.concert.IloException;
 import ilog.concert.IloLPMatrix;
 import ilog.concert.IloLinearNumExpr;
@@ -40,6 +41,7 @@ public class BNBR_Driver {
     //constraints in this mip
     public static List<LowerBoundConstraint> mipConstraintList ;
     public static Objective objective ;
+    public static List<String> allVariablesInModel ;
     
     
     
@@ -54,7 +56,7 @@ public class BNBR_Driver {
         }
             
         logger=Logger.getLogger(BNBR_Driver.class);
-        logger.setLevel(Level.DEBUG);
+        logger.setLevel(Level.OFF);
         
         PatternLayout layout = new PatternLayout("%5p  %d  %F  %L  %m%n");     
         try {
@@ -76,34 +78,29 @@ public class BNBR_Driver {
         mip.importModel(MIP_FILENAME);
         mipConstraintList= getConstraints(mip);
         objective= getObjective(mip);
+        allVariablesInModel = getVariables(mip) ;
         
-        RECTS_COLLECTED_PER_CONSTRAINT  = Math.max(Math.round( MAX__RECTS_TIMES_CONSTRAINTS/mipConstraintList.size()), ONE);
-        if (MAX__RECTS_COLLECTED_PER_CONSTRAINT < RECTS_COLLECTED_PER_CONSTRAINT) RECTS_COLLECTED_PER_CONSTRAINT=MAX__RECTS_COLLECTED_PER_CONSTRAINT;
+        RECTS_TO_BE_COLLECTED_PER_CONSTRAINT  = Math.max(Math.round( MAX__RECTS_TIMES_CONSTRAINTS/mipConstraintList.size()), ONE);
+        if (MAX__RECTS_COLLECTED_PER_CONSTRAINT < RECTS_TO_BE_COLLECTED_PER_CONSTRAINT) RECTS_TO_BE_COLLECTED_PER_CONSTRAINT=MAX__RECTS_COLLECTED_PER_CONSTRAINT;
         
         
-        System.out.println ("Starting rectangle collection ... " + MIP_FILENAME) ;
+        System.out.println ("Starting solution for ... " + MIP_FILENAME + " RECTS_TO_BE_COLLECTED_PER_CONSTRAINT "+RECTS_TO_BE_COLLECTED_PER_CONSTRAINT) ;
         
-        //test
-        Analytic_RectangleCollector collector = null;
-        for (LowerBoundConstraint lbc : mipConstraintList){
-            SolutionTree_Node treenode=new SolutionTree_Node ();
-            collector= new Analytic_RectangleCollector ( treenode, lbc);
-            collector.collect(2);
-            
-            logger.debug ("Dumping collected rects " ) ;
-            for (List<CollectedRectangle> rectList:collector.collectedFeasibleRectangles.values()) {
-                for (CollectedRectangle cr : rectList){
-                    logger.debug (cr) ;
-                }
-            }
-
-        }
-       
-        //end test
-        
+        BNBR_Solver solver = new BNBR_Solver () ;
+        solver.solve();
+        System.out.println("The incumbent is = " +solver.incumbent) ;
         
     }//end main
     
+    private static List<String> getVariables (IloCplex cplex) throws IloException{
+        List<String> result = new ArrayList<String>();
+        IloLPMatrix lpMatrix = (IloLPMatrix)cplex.LPMatrixIterator().next();
+        IloNumVar[] variables  =lpMatrix.getNumVars();
+        for (IloNumVar var :variables){
+            result.add(var.getName()) ;
+        }
+        return result;
+    }
     
     //minimization objective
     private static Objective getObjective (IloCplex cplex) throws IloException {

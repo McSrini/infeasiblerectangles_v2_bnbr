@@ -7,8 +7,7 @@ package ca.mcmaster.infeasiblerectangles_v2_bnbr.collection;
 
 import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Constants.*; 
 import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Parameters.*;
-import ca.mcmaster.infeasiblerectangles_v2_bnbr.common.*;
-import ca.mcmaster.infeasiblerectangles_v2_bnbr.common.*;
+import ca.mcmaster.infeasiblerectangles_v2_bnbr.common.*; 
 import static java.lang.System.exit;
 import java.util.*;
 import org.apache.log4j.*;
@@ -34,7 +33,7 @@ import org.apache.log4j.*;
  */
 public class Analytic_RectangleCollector {
     
-    public   Map<Double, List<CollectedRectangle>  > collectedFeasibleRectangles = new TreeMap <Double, List<CollectedRectangle>>  ();    
+    public   Map<Double, List<Rectangle>  > collectedFeasibleRectangles = new TreeMap <Double, List<Rectangle>>  ();    
     
     //this is the leaf node and its complimented constraint for which we will collect rects
     private UpperBoundConstraint ubc ;
@@ -42,7 +41,10 @@ public class Analytic_RectangleCollector {
         
     //here are the nodes which are by products of createing th efeasible node. These need to be
     //decomposed further to get more feasible nodes
-    private    Map<Double, List<CollectedRectangle>  > pendingJobs = new TreeMap <Double, List<CollectedRectangle>>  ();    
+    private    Map<Double, List<Rectangle>  > pendingJobs = new TreeMap <Double, List<Rectangle>>  ();  
+    
+    //we dont collect rectangles unless this constraint chops off the LP vertex
+    private boolean isLpVertexChoppedOff = false;
     
     private static Logger logger=Logger.getLogger(Analytic_RectangleCollector.class);
     
@@ -72,39 +74,55 @@ public class Analytic_RectangleCollector {
          
         if (reduced.isGauranteedFeasible(!USE_STRICT_INEQUALITY_IN_MIP)){            
             
-            CollectedRectangle cr = new CollectedRectangle (leaf.zeroFixedVariables, leaf.oneFixedVariables );
+            Rectangle cr = new Rectangle (leaf.zeroFixedVariables, leaf.oneFixedVariables );
             cr.getLpRelaxVertex_Minimization();
-            List<CollectedRectangle> jobList = new ArrayList<CollectedRectangle>();
+            List<Rectangle> jobList = new ArrayList<Rectangle>();
             jobList.add( cr);
             pendingJobs.put(lp , jobList);
-            logger.debug( "leaf id is " + leaf.myId + " and constraint  for collection is " +ubc + " will collect upto this many rects " + RECTS_COLLECTED_PER_CONSTRAINT );
+            logger.debug( "leaf id is " + leaf.myId + " and constraint  for collection is " +ubc + " will collect upto this many rects " + RECTS_TO_BE_COLLECTED_PER_CONSTRAINT );
+            isLpVertexChoppedOff = true;
         }else {
             logger.debug( "leaf id is " + leaf.myId + " and constraint  for collection is " +ubc + " will NOT collect rects ");
         }
         
     }
         
-    public void collect(int max_Collection_size){
+    //collect rects and return true if all collected
+    public boolean collect(int max_Collection_size){
         //remove the best pending node and decompose it, until pending list is empty or #of collected rects exceeds threshold
-        while (!this.pendingJobs.isEmpty() && collectedFeasibleRectangles.size() < max_Collection_size) {
+         
+        while (!this.pendingJobs.isEmpty() && getNumberOfRects(this.collectedFeasibleRectangles) < max_Collection_size) {
             
            printAllJobs();
            
            double bestLPRelax = Collections.min( pendingJobs.keySet());
-           List<CollectedRectangle> bestLPJobs = pendingJobs.get(bestLPRelax);
-           CollectedRectangle job = bestLPJobs.remove(ZERO);
+           List<Rectangle> bestLPJobs = pendingJobs.get(bestLPRelax);
+           Rectangle job = bestLPJobs.remove(ZERO);
            if (bestLPJobs.size()==ZERO) {
                pendingJobs.remove(bestLPRelax);
            }else {
                pendingJobs.put(bestLPRelax, bestLPJobs);
            }
+           
            decompose(job);
+            
            
         }
+        
+        //return true if we collected, and collected everything
+        return this.pendingJobs.isEmpty() && isLpVertexChoppedOff;
+    }
+    
+    private static int getNumberOfRects ( Map<Double, List<Rectangle> > map2){
+        int count = ZERO;
+        for (List<Rectangle> rectlist : map2.values()){
+            count +=rectlist.size();
+        }
+        return count;
     }
     
     //decompose a leaf node and add feasible node found into collection, and more jobs into joblist
-    private void decompose (CollectedRectangle leafNode) {
+    private void decompose (Rectangle leafNode) {
         
         logger.debug("decomposing job "+ leafNode);
         
@@ -164,10 +182,10 @@ public class Analytic_RectangleCollector {
             }//end for
                         
             //now we know the vars which can be free. Note that all vars cannot be free, because entire rectangle feasible has been taken care of
-            CollectedRectangle feasibleLeaf = createFeasibleRectangle (leafNode, isVariableFixedAtZeroAtOrigin,countOfVarsWhichCanBeFree ,reducedConstraint) ;
+            Rectangle feasibleLeaf = createFeasibleRectangle (leafNode, isVariableFixedAtZeroAtOrigin,countOfVarsWhichCanBeFree ,reducedConstraint) ;
             this.addLeafToFeasibleCollection(feasibleLeaf );
             
-            List<CollectedRectangle> newJobs = null;
+            List<Rectangle> newJobs = null;
             if ( countOfVarsWhichCanBeFree!=ZERO) {
                 newJobs = createMoreNodesForDecompostion (leafNode, isVariableFixedAtZeroAtOrigin,countOfVarsWhichCanBeFree ,reducedConstraint) ;
                 this.addPendingJobs(newJobs);  
@@ -178,15 +196,15 @@ public class Analytic_RectangleCollector {
         }//end else
     }//end method
     
-    private List<CollectedRectangle> createMoreNodesForDecompostion (CollectedRectangle leafNode, List<Boolean> isVariableFixedAtZeroAtOrigin,
+    private List<Rectangle> createMoreNodesForDecompostion (Rectangle leafNode, List<Boolean> isVariableFixedAtZeroAtOrigin,
                                                           int countOfVarsWhichCanBeFree,  UpperBoundConstraint reducedConstraint ) {
         
-        List<CollectedRectangle> newJobs = new ArrayList<CollectedRectangle>();
+        List<Rectangle> newJobs = new ArrayList<Rectangle>();
         
         //starting with the highest coeff var in the reduced constraint, flip var value from origin, and for all higher coeff vars retain their value at origin
         //# of jobs created = (# of freevars in reduced constr - countOfVarsWhichCanBeFree)
         for (int jobIndex = ZERO; jobIndex< reducedConstraint.sortedConstraintExpr.size()- countOfVarsWhichCanBeFree;jobIndex++){
-            CollectedRectangle  newJob = new CollectedRectangle(leafNode.zeroFixedVariables, leafNode.oneFixedVariables ) ;
+            Rectangle  newJob = new Rectangle(leafNode.zeroFixedVariables, leafNode.oneFixedVariables ) ;
             
             //add flipped  branching condition for jth largest var
             int size = reducedConstraint.sortedConstraintExpr.size();
@@ -212,11 +230,11 @@ public class Analytic_RectangleCollector {
         return newJobs ;
     }
         
-    private CollectedRectangle createFeasibleRectangle (CollectedRectangle leafNode, List<Boolean> isVariableFixedAtZeroAtOrigin,
+    private Rectangle createFeasibleRectangle (Rectangle leafNode, List<Boolean> isVariableFixedAtZeroAtOrigin,
                                                int countOfVarsWhichCanBeFree, UpperBoundConstraint reducedConstraint  ) {
         //create a branch using vars which are not free, and fix their values to their value at origin
         //origin is lp vertex
-        CollectedRectangle result = new CollectedRectangle (leafNode.zeroFixedVariables, leafNode.oneFixedVariables ) ;
+        Rectangle result = new Rectangle (leafNode.zeroFixedVariables, leafNode.oneFixedVariables ) ;
         for (int index = countOfVarsWhichCanBeFree; index < isVariableFixedAtZeroAtOrigin.size(); index ++) {
             //get var value at origin, and fix it at that value
             if (isVariableFixedAtZeroAtOrigin.get(index)){
@@ -231,30 +249,30 @@ public class Analytic_RectangleCollector {
     }
     
     
-    private void addLeafToFeasibleCollection (CollectedRectangle leafNode){
-        List<CollectedRectangle> rects= collectedFeasibleRectangles.get( leafNode.getLpRelaxVertex_Minimization());
-        if (rects==null) rects =new ArrayList<CollectedRectangle> ();
+    private void addLeafToFeasibleCollection (Rectangle leafNode){
+        List<Rectangle> rects= collectedFeasibleRectangles.get( leafNode.getLpRelaxVertex_Minimization());
+        if (rects==null) rects =new ArrayList<Rectangle> ();
         rects.add(leafNode) ;
         collectedFeasibleRectangles.put( leafNode.lpRelaxValueMinimization, rects);
     }
     
-    private void addPendingJobs (List<CollectedRectangle> jobs) {
-        for (CollectedRectangle job : jobs){
+    private void addPendingJobs (List<Rectangle> jobs) {
+        for (Rectangle job : jobs){
             addPendingJob(job);
         }
     }
     
-    private void addPendingJob (CollectedRectangle job) {
-        List<CollectedRectangle> rects= this.pendingJobs.get(job.getLpRelaxVertex_Minimization());
-        if (rects==null) rects =new ArrayList<CollectedRectangle> ();
+    private void addPendingJob (Rectangle job) {
+        List<Rectangle> rects= this.pendingJobs.get(job.getLpRelaxVertex_Minimization());
+        if (rects==null) rects =new ArrayList<Rectangle> ();
         rects.add(job) ;
         this.pendingJobs.put( job.lpRelaxValueMinimization, rects);
     }
     
         
     private void printAllJobs() {
-        for (List<CollectedRectangle> jobList : this.pendingJobs.values()){
-            for (CollectedRectangle  job: jobList){
+        for (List<Rectangle> jobList : this.pendingJobs.values()){
+            for (Rectangle  job: jobList){
                 logger.debug(job);
             }
         }

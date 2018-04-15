@@ -17,7 +17,7 @@ import org.apache.log4j.*;
  *
  * @author tamvadss
  */
-public abstract class Rectangle {
+public   class Rectangle {
     
     //note that some vars can be free
     public List <String> zeroFixedVariables = new ArrayList <String>();

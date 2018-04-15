@@ -17,21 +17,30 @@ public class Objective {
         
     public List<VariableCoefficientTuple>   objectiveExpr ; 
     
-    private Map<String, Double> coeffs = new HashMap <String, Double> ();
+    private Map<String, Double> coefficientMagnitudes = new HashMap <String, Double> ();
+    private Map<String, Double> coefficientsWithSign = new HashMap <String, Double> ();
       
     public Objective( List<VariableCoefficientTuple>  expr   ) {
          
          
         objectiveExpr = expr;
         for (VariableCoefficientTuple tuple : this.objectiveExpr){
-            this.coeffs.put(tuple.varName, Math.abs(tuple.coeff));
+            this.coefficientMagnitudes.put(tuple.varName, Math.abs(tuple.coeff));
+            this.coefficientsWithSign.put(tuple.varName,  tuple.coeff);
         }
         
     }
     
     public Double getObjectiveCoeff( String  var ){
          
-        return coeffs.get(var);
+        return coefficientsWithSign.get(var);
+    }
+    
+    
+    
+    public Double getObjectiveCoeffMagnitude( String  var ){
+         
+        return coefficientMagnitudes.get(var);
     }
     
     public String toString() {
