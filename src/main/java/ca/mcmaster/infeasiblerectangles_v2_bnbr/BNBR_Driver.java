@@ -14,6 +14,7 @@ import ca.mcmaster.infeasiblerectangles_v2_bnbr.collection.Analytic_RectangleCol
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.common.*;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.common.Objective;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.analytic.BNBR_Solver;
+import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.analytic.Enum_Solver;
 import ilog.concert.IloException;
 import ilog.concert.IloLPMatrix;
 import ilog.concert.IloLinearNumExpr;
@@ -86,7 +87,8 @@ public class BNBR_Driver {
         
         System.out.println ("Starting solution for ... " + MIP_FILENAME + " RECTS_TO_BE_COLLECTED_PER_CONSTRAINT "+RECTS_TO_BE_COLLECTED_PER_CONSTRAINT) ;
         
-        BNBR_Solver solver = new BNBR_Solver () ;
+        //BNBR_Solver solver = new BNBR_Solver () ;
+        Enum_Solver solver = new Enum_Solver () ;
         solver.solve();
         System.out.println("The incumbent is = " +solver.incumbent) ;
         

@@ -115,6 +115,7 @@ public class BNBR_Solver {
                 //Also since we are doing best-first, this will be optimal
                 Rectangle optimalSolution = new Rectangle (selectedNode.lpVertex_zeroFixedVariables, selectedNode.lpVertex_oneFixedVariables) ;
                 this.addSolutionToPool(optimalSolution);
+                 
                 logger.debug("found optimal solution " + optimalSolution);
                 break ; //end while active leafs left
             } else {

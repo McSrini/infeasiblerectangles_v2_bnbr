@@ -13,10 +13,10 @@ package ca.mcmaster.infeasiblerectangles_v2_bnbr;
     
        //public static final String MIP_FILENAME = "F:\\temporary files here\\knapsackFourTest.lp";  ////x1 x7  x4  x2
        //public static final String MIP_FILENAME = "F:\\temporary files here\\knapsackSmall.lp";  ////x1 x7  x4  x2
-       public static final String MIP_FILENAME = "F:\\temporary files here\\harp2.mps";
+       //public static final String MIP_FILENAME = "F:\\temporary files here\\p6b.mps";
        //public static final String MIP_FILENAME = "harp2.mps";
        //public static final String MIP_FILENAME = "cov1075.mps";
-       //public static final String MIP_FILENAME = "p6b.mps";
+       public static final String MIP_FILENAME = "p6b.mps";
        
        public static boolean USE_STRICT_INEQUALITY_IN_MIP = false;
        

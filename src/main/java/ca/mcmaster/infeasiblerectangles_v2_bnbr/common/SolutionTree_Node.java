@@ -11,6 +11,7 @@ import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Constants.*;
 import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Parameters.RECTS_TO_BE_COLLECTED_PER_CONSTRAINT;
 import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Parameters.REPLENISH_THESHOLD_FRACTION;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.collection.Analytic_RectangleCollector;
+import static java.lang.System.exit;
 import java.util.*;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -57,7 +58,55 @@ public class SolutionTree_Node extends Rectangle{
         return "Node id " + myId + " " + super.toString() ; //+ printmyInfeasibleRectanglesList(); //+ " infeas map size " + myInfeasibleRectangles.size();
     }
     
-    public String printmyInfeasibleRectanglesList() {
+       //invoke this method before inserting into active leaf list for enum solver
+    //
+    //this code is duplicated and needs to be moved to the proper location
+    //
+    //returns negative freq
+    public int getRefcount_of_HighestFreqVar( ) {
+        List<Rectangle> rectanglesToConsider = new ArrayList<Rectangle> ();
+         
+        //for every constraint, see if it has rects at the best lp
+        double bestLPAmongAllInfeasibleRectangles = this.getBestLPAmongAllInfeasibleRectangles();
+        
+        for (Map <Double, List<Rectangle>> rectMap: myInfeasibleRectanglesList) {
+            List<Rectangle> rects = rectMap.get( bestLPAmongAllInfeasibleRectangles);
+            if (null!=rects) {
+                rectanglesToConsider.addAll(rects );
+            }
+        }
+        
+        //find the var with the highest refcount and return its refcount
+        
+        //collect refcounts into this map
+        Map<String, Integer> varRefCountMap = new HashMap<String, Integer> () ;
+        
+        List<VariableCoefficientTuple> variablesUsedForBranchingInThisRectangle =null;
+        for (Rectangle rect: rectanglesToConsider){
+            variablesUsedForBranchingInThisRectangle = getVariablesUsedForBranchingInThisRectangle (rect);
+            if (variablesUsedForBranchingInThisRectangle.size()>ZERO) {
+                this.updateVariableRefCounts(varRefCountMap, variablesUsedForBranchingInThisRectangle) ;
+            }else {
+                System.err.print("trying to branch a node which should have been marked infeasible" );
+                exit(ONE);
+            }
+        }
+        
+        //arrange vars in refcount order
+        //note we multiply by -1 to get in decreasing order
+        Map< Integer,List<String>> orderedVarRefCountMap = new TreeMap< Integer,List<String>> () ;
+        for (Map.Entry<String, Integer> entry : varRefCountMap.entrySet()) {
+            List<String> currentList = orderedVarRefCountMap.get(-entry.getValue());
+            if (null==currentList) currentList=new ArrayList<String>();
+            currentList.add(entry.getKey() );
+            orderedVarRefCountMap.put(-entry.getValue(), currentList);
+            
+        }
+        
+        return Collections.min(orderedVarRefCountMap.keySet());
+    }
+    
+    /*public String printmyInfeasibleRectanglesList() {
         String result = "";
         for (TreeMap <Double, List<Rectangle>> map : this.myInfeasibleRectanglesList){
             for (Entry<Double, List<Rectangle>> entry : map.entrySet()) {
@@ -68,7 +117,7 @@ public class SolutionTree_Node extends Rectangle{
             }
         }
         return result ;
-    }
+    }*/
     
     public void setInfeasibleRectangles (int constraintNumber, TreeMap <Double, List<Rectangle>> newMap) {
         myInfeasibleRectanglesList.set(constraintNumber , newMap);
@@ -125,6 +174,33 @@ public class SolutionTree_Node extends Rectangle{
         }
         
         return lowest;
+    }
+    
+    //duplicated code, move to proper location
+    private void updateVariableRefCounts(Map<String, Integer>  varRefCountMap, List<VariableCoefficientTuple>  variablesUsedForBranchingInThisRectangle){
+        for (VariableCoefficientTuple tuple : variablesUsedForBranchingInThisRectangle) {
+            int currentCount = varRefCountMap.get(tuple.varName) == null ? ZERO: varRefCountMap.get(tuple.varName );
+            varRefCountMap.put(tuple.varName, ONE+currentCount);
+        }
+    }
+    //duplictaded code    
+    //get vars used , consider only free vars
+    private  List<VariableCoefficientTuple> getVariablesUsedForBranchingInThisRectangle(Rectangle rect){
+        List<VariableCoefficientTuple> variablesUsedForBranchingInThisRectangle = new ArrayList<VariableCoefficientTuple> ();
+        
+        for (String var : rect.zeroFixedVariables) {
+            if (!this.zeroFixedVariables.contains(var) && !this.oneFixedVariables.contains(var)) 
+                variablesUsedForBranchingInThisRectangle.add(new VariableCoefficientTuple(var, ZERO) );
+        }
+        for (String var : rect.oneFixedVariables){
+            //if (!variablesUsedForBranchingInThisRectangle.contains(var)) { //always true
+                 if (!this.zeroFixedVariables.contains(var) && !this.oneFixedVariables.contains(var)) {
+                     variablesUsedForBranchingInThisRectangle.add(new VariableCoefficientTuple(var, ONE));
+                 }
+            //}
+        }
+         
+        return variablesUsedForBranchingInThisRectangle;
     }
     
 }

@@ -40,6 +40,8 @@ public class Enumerator {
          soln.zeroFixedVariables.addAll(nodeZeroFixedVariables);
          soln.oneFixedVariables.addAll(nodeOneFixedVariables);
          
+        
+         
          for (Rectangle infeasibleRect:  infeasibleRectangles) {
              
              //if this rectangle has any variables which are free, we can grow them to their best value
@@ -60,14 +62,23 @@ public class Enumerator {
         
         Rectangle bestSolution =  getBestVarFixings(zeroFixedVariablesInTheInfeasileRect,   oneFixedVarsInTheInfeasibleRect) ;
          
-        //if best solution var fixings are a perfect match with th einfeasible rect var fixings, then we go for the 2nd best soln
+        //if best solution var fixings are a   match with the infeasible rect var fixings, then we go for the 2nd best soln
         //else just return the best solution
-        if (bestSolution.zeroFixedVariables.containsAll(zeroFixedVariablesInTheInfeasileRect )&&
-            bestSolution.oneFixedVariables.containsAll(oneFixedVarsInTheInfeasibleRect)  &&
+        //
+        
+         //there is bug which was found and fixed here:
+         //suppose you have 2 rects, (x1=0, x2=0) and (x1=0, x3=0) of which x1=0 is a branching condition for the node
+         //Since our best solution only contains choices for  free vars, if al the free var choices are included in the infeasible rect, the choice is invalid
+         //WE have to go for the second best fixing for these free vars in such cases
+         //Note the if consition below: if best solution a subset of vars fixed in infeasible rect, then go for 2nd best soln
+        
+        //
+        if (/*bestSolution.zeroFixedVariables.containsAll(zeroFixedVariablesInTheInfeasileRect )&&
+            bestSolution.oneFixedVariables.containsAll(oneFixedVarsInTheInfeasibleRect)  &&*/
             oneFixedVarsInTheInfeasibleRect.containsAll(bestSolution.oneFixedVariables )  &&
             zeroFixedVariablesInTheInfeasileRect.containsAll( bestSolution.zeroFixedVariables)    ) {
             
-            //use second best solution, which gauranteed to exist
+            //use second best solution, which gauranteed to exist ( if rect is invalid then one variable flipped has to be valid).
             bestSolution =  getSecondBestVarFixings(bestSolution);
             
         }else {

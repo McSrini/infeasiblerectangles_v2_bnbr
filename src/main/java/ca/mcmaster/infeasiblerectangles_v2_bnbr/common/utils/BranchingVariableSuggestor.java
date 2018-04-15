@@ -233,11 +233,11 @@ public class BranchingVariableSuggestor {
                 variablesUsedForBranchingInThisRectangle.add(new VariableCoefficientTuple(var, ZERO) );
         }
         for (String var : rect.oneFixedVariables){
-            if (!variablesUsedForBranchingInThisRectangle.contains(var)) {
+            //if (!variablesUsedForBranchingInThisRectangle.contains(var)) { //always true
                  if (!treeNode_zeroFixedVariables.contains(var) && !treeNode_oneFixedVariables.contains(var)) {
                      variablesUsedForBranchingInThisRectangle.add(new VariableCoefficientTuple(var, ONE));
                  }
-            }
+            //}
         }
          
         return variablesUsedForBranchingInThisRectangle;
