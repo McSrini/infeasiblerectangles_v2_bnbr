@@ -153,6 +153,8 @@ public class SolutionTree_Node extends Rectangle{
                 // System.out.println(" not all collected for "+BNBR_Driver.mipConstraintList.get(constraintNumber).name) ;
             }
         }
+        
+         
     }
 
     public  List<Rectangle> getAllInfeasibleRectangles () {

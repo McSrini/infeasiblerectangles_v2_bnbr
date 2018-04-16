@@ -24,7 +24,7 @@ public class VariableCoefficientTuple  implements Comparable{
        
     //lowest magnitude coeff first
     public int compareTo(Object other) {
-       return Math.abs(this.coeff )> Math.abs(  ((VariableCoefficientTuple)other).coeff )? ONE:-ONE;
+       return Double.compare(Math.abs(this.coeff ), Math.abs(  ((VariableCoefficientTuple)other).coeff ));
     } 
     
     public String toString (){

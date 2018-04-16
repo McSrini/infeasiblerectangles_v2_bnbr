@@ -159,7 +159,12 @@ public class BNBR_Driver {
                     Double coeff =  constraintIterator.getValue();
                     constraintExpr.add(new VariableCoefficientTuple(varName, isUpperBound? -coeff: coeff));
                 }
+                
                 //here is the constraint, in our format
+                
+                 
+                
+                
                 lbc  = new LowerBoundConstraint (rangeConstraint.getName(),   constraintExpr,   pseudoBound ) ;
                 //add it to our list of constraints
                 result.add(lbc);
