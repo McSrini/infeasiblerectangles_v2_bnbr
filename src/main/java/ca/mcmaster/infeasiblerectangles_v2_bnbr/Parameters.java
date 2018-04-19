@@ -11,12 +11,15 @@ package ca.mcmaster.infeasiblerectangles_v2_bnbr;
  */
  public class Parameters {
     
-       public static final String MIP_FILENAME = "F:\\temporary files here\\knapsackFourTest.lp";  ////x1 x7  x4  x2
+       //public static final String MIP_FILENAME = "F:\\temporary files here\\knapsackFourTest.lp";  ////x1 x7  x4  x2
        //public static final String MIP_FILENAME = "F:\\temporary files here\\knapsackSmall.lp";  ////x1 x7  x4  x2
-       //public static final String MIP_FILENAME = "F:\\temporary files here\\seymour-disj-10.mps";
+       //public static final String MIP_FILENAME = "F:\\temporary files here\\p6b.mps";
        //public static final String MIP_FILENAME = "harp2.mps";
        //public static final String MIP_FILENAME = "cov1075.mps";
-       //public static final String MIP_FILENAME = "ramos3.mps";
+       public static final String MIP_FILENAME = "p6b.mps";
+
+       //enum solver does not care for solutions that are not at least this much better
+       public static double  ENUM_SOLVER_MIP_GAP=0.50;
        
        public static boolean USE_STRICT_INEQUALITY_IN_MIP = false;
        

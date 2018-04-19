@@ -10,7 +10,8 @@ import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Constants.LOG_FILE_EXTENS
 import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Constants.LOG_FOLDER;
 import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Constants.ONE;
 import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Constants.TEN;
-import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Constants.ZERO;
+import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Constants.*;
+import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Parameters.*;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.common.LowerBoundConstraint;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.common.Rectangle;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.common.SolutionTree_Node;
@@ -86,7 +87,7 @@ public class Enum_Solver {
             int numberOFLeafsAtLowestRefcount = this.activeLeafs.get( lowestRefCount).size();
             
             List<SolutionTree_Node> bestNodes = this.activeLeafs.get( lowestRefCount);
-            SolutionTree_Node selectedNode =bestNodes.remove(ZERO);
+            SolutionTree_Node selectedNode =removeBestLPNodeFrom (bestNodes) ;
             if (bestNodes.size()==ZERO) {
                 this.activeLeafs.remove( lowestRefCount);
             }else {
@@ -106,7 +107,8 @@ public class Enum_Solver {
             
             //this node can be a solution , require branching, or get cutoff by the incumbent
             double bestLPAmongAllInfeasibleRectangles = selectedNode.getBestLPAmongAllInfeasibleRectangles();
-            if ( selectedNode.lpRelaxValueMinimization>=incumbent){
+            
+            if ( selectedNode.lpRelaxValueMinimization>=(incumbent*(ONE-ENUM_SOLVER_MIP_GAP))){
                 //discard
             } else if (selectedNode.lpRelaxValueMinimization<bestLPAmongAllInfeasibleRectangles) {
                 //this Lp vertex is a feasible solution
@@ -200,6 +202,19 @@ public class Enum_Solver {
             }
         }
         return status;
+    }
+    
+    private SolutionTree_Node  removeBestLPNodeFrom(List<SolutionTree_Node> nodes) {
+        SolutionTree_Node result = null ;
+        double bestLP = Double.MAX_VALUE;
+        for (SolutionTree_Node  node: nodes){
+            if (node.lpRelaxValueMinimization< bestLP){
+                result = node;
+                bestLP = node.lpRelaxValueMinimization;
+            }
+        }
+        nodes.remove(result);
+        return result;
     }
     
     //create two child nodes and return the one which obeys the direction indicated in th etuple, so that it can be branched again
@@ -317,8 +332,9 @@ public class Enum_Solver {
     
     private void addSolutionToPool(Rectangle soln) {
         incumbent = Math.min(incumbent, soln.getLpRelaxVertex_Minimization()) ;
-        List<Rectangle>  solnList = this.solutionPool.get( soln.lpRelaxValueMinimization);
-        if (solnList==null) solnList = new ArrayList<Rectangle> ();
+        //add only 1 soln per lp relax value
+        List<Rectangle>  solnList = /*this.solutionPool.get( soln.lpRelaxValueMinimization);
+        if (solnList==null) solnList =*/ new ArrayList<Rectangle> ();
         solnList.add(soln);
         this.solutionPool.put(soln .lpRelaxValueMinimization , solnList);
     }
