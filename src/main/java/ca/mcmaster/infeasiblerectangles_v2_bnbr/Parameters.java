@@ -11,7 +11,7 @@ package ca.mcmaster.infeasiblerectangles_v2_bnbr;
  */
  public class Parameters {
     
-       //public static final String MIP_FILENAME = "F:\\temporary files here\\knapsackFourTest.lp";  ////x1 x7  x4  x2
+       // public static final String MIP_FILENAME = "F:\\temporary files here\\knapsackFourTest.lp";  ////x1 x7  x4  x2
        //public static final String MIP_FILENAME = "F:\\temporary files here\\knapsackSmall.lp";  ////x1 x7  x4  x2
        //public static final String MIP_FILENAME = "F:\\temporary files here\\p6b.mps";
        //public static final String MIP_FILENAME = "harp2.mps";
@@ -19,15 +19,15 @@ package ca.mcmaster.infeasiblerectangles_v2_bnbr;
        public static final String MIP_FILENAME = "p6b.mps";
 
        //enum solver does not care for solutions that are not at least this much better
-       public static double  ENUM_SOLVER_MIP_GAP=0.50;
+       public static double  ENUM_SOLVER_MIP_GAP=0.750;
        
        public static boolean USE_STRICT_INEQUALITY_IN_MIP = false;
        
        //for rectangle collection
        public static int MAX__RECTS_TIMES_CONSTRAINTS = 1000000;
-       public static int MAX__RECTS_COLLECTED_PER_CONSTRAINT = 200; 
+       public static int MAX__RECTS_COLLECTED_PER_CONSTRAINT = 100; 
        public static int RECTS_TO_BE_COLLECTED_PER_CONSTRAINT = 1;  // this is the lower limit, could go up to MAX_RECTS Defined above
-       public static double REPLENISH_THESHOLD_FRACTION = 0.5;
+       //public static double REPLENISH_THESHOLD_FRACTION = 0.5;
        
        //for branching var selection
        public static double FRACTION_OF_INFERIOR_LP_RECTS_TO_CONSIDER = 0.2; //conser any rect which is 1.x times the LP, or less

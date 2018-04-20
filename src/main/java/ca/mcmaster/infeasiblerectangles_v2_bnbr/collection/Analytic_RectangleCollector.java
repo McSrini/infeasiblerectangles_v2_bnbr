@@ -49,7 +49,7 @@ public class Analytic_RectangleCollector {
     private static Logger logger=Logger.getLogger(Analytic_RectangleCollector.class);
     
     static {
-        logger.setLevel(Level.DEBUG);
+        logger.setLevel(Level.WARN);
         PatternLayout layout = new PatternLayout("%5p  %d  %F  %L  %m%n");     
         try {
             logger.addAppender(new  RollingFileAppender(layout,LOG_FOLDER+Analytic_RectangleCollector.class.getSimpleName()+ LOG_FILE_EXTENSION));

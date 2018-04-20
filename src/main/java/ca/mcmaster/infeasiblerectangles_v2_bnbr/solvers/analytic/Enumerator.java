@@ -51,6 +51,7 @@ public class Enumerator {
              soln.zeroFixedVariables.addAll(delta.zeroFixedVariables );
              soln.oneFixedVariables.addAll( delta.oneFixedVariables);
          }
+         soln.getLpRelaxVertex_Minimization();
          return soln;
          
     }

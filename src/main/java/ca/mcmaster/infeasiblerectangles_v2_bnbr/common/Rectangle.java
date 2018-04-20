@@ -101,6 +101,21 @@ public   class Rectangle {
         }
         return result;
     }
+    
+    public   List<String> getVariablesUsedForBranchingInThisRectangle( ){
+        List<String> variablesUsedForBranchingInThisRectangle = new ArrayList<String> ();
+        
+        for (String var : this.zeroFixedVariables) {
+            variablesUsedForBranchingInThisRectangle.add( var  );
+        }
+        for (String var : this.oneFixedVariables){
+            if (!variablesUsedForBranchingInThisRectangle.contains(var)) {  
+                 variablesUsedForBranchingInThisRectangle.add( var );
+            }             
+        }
+         
+        return variablesUsedForBranchingInThisRectangle;
+    }
 
 }
 

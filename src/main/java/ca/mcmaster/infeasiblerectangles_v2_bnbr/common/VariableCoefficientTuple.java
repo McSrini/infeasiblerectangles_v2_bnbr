@@ -14,7 +14,7 @@ import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Constants.ONE;
 public class VariableCoefficientTuple  implements Comparable{
     
     public String varName ;
-    public Double coeff;
+    public double coeff;
     
     public VariableCoefficientTuple (String varname, double coefficient)   {
     

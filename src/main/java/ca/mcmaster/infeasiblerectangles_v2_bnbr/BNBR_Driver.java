@@ -12,10 +12,13 @@ import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Parameters.*;
 import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Parameters.MIP_FILENAME;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.collection.Analytic_RectangleCollector;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.common.*;
+import ca.mcmaster.infeasiblerectangles_v2_bnbr.common.utils.*;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.common.Objective;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.analytic.BNBR_Solver;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.analytic.BN_LowestRef_Solver;
+import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.analytic.Conflict_Solver;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.analytic.Enum_Solver;
+import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.analytic.bucket.BucketSolver;
 import ilog.concert.IloException;
 import ilog.concert.IloLPMatrix;
 import ilog.concert.IloLinearNumExpr;
@@ -29,6 +32,7 @@ import java.io.File;
 import static java.lang.System.exit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -58,7 +62,7 @@ public class BNBR_Driver {
         }
             
         logger=Logger.getLogger(BNBR_Driver.class);
-        logger.setLevel(Level.OFF);
+        logger.setLevel(Level.WARN);
         
         PatternLayout layout = new PatternLayout("%5p  %d  %F  %L  %m%n");     
         try {
@@ -88,11 +92,21 @@ public class BNBR_Driver {
         
         System.out.println ("Starting solution for ... " + MIP_FILENAME + " RECTS_TO_BE_COLLECTED_PER_CONSTRAINT "+RECTS_TO_BE_COLLECTED_PER_CONSTRAINT) ;
         
+        //test
+        /*SolutionTree_Node root =new SolutionTree_Node (new ArrayList <String> (),new ArrayList <String> ());
+        root.replenishRectangles();
+        printInfeasibleRectangles(root);
+        ConflictVariableSuggestor varSuggestor=new ConflictVariableSuggestor ( root );
+        TwoIntegerTuple childRectCounts = new TwoIntegerTuple ();
+        VariableCoefficientTuple suggestion = varSuggestor.suggestBranchingVariable(childRectCounts);*/
+        
         //BNBR_Solver solver = new BNBR_Solver () ;
-        Enum_Solver solver = new Enum_Solver () ;
+        //Enum_Solver solver = new Enum_Solver () ;
         //BN_LowestRef_Solver solver = new BN_LowestRef_Solver ();
+        //BucketSolver solver = new BucketSolver();
+        Conflict_Solver solver = new Conflict_Solver() ;
         solver.solve();
-        System.out.println("The incumbent is = " +solver.incumbent) ;
+        System.out.println("The MIP incumbent is = " +solver.incumbent) ;
         
     }//end main
     
@@ -234,7 +248,21 @@ public class BNBR_Driver {
         
     }//end method
     
-    
+    private static void  printInfeasibleRectangles(SolutionTree_Node selectedNode) {
+         logger.debug("");
+         int index = -ONE;
+         for (Map <Double, List<Rectangle>> rectMap:selectedNode.myInfeasibleRectanglesList) {
+             logger.debug("rect list for   constraint " + BNBR_Driver.mipConstraintList.get(++index).name) ;
+             for (List<Rectangle> nodes : rectMap.values()) {
+                 for (Rectangle node : nodes ){
+                     logger.debug(node);
+                 }
+             }
+         }
+         
+         logger.debug("");
+    }
+        
     private static boolean isHaltFilePresent (){
         File file = new File( HALT_FILE);
          

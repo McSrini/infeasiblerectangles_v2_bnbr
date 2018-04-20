@@ -9,7 +9,7 @@ package ca.mcmaster.infeasiblerectangles_v2_bnbr.common;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.BNBR_Driver;
 import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Constants.*;
 import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Parameters.RECTS_TO_BE_COLLECTED_PER_CONSTRAINT;
-import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Parameters.REPLENISH_THESHOLD_FRACTION;
+//import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Parameters.REPLENISH_THESHOLD_FRACTION;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.collection.Analytic_RectangleCollector;
 import static java.lang.System.exit;
 import java.util.*;
