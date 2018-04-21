@@ -108,7 +108,7 @@ public class Enum_Solver {
             //this node can be a solution , require branching, or get cutoff by the incumbent
             double bestLPAmongAllInfeasibleRectangles = selectedNode.getBestLPAmongAllInfeasibleRectangles();
             
-            if ( selectedNode.lpRelaxValueMinimization>=(incumbent*(ONE-ENUM_SOLVER_MIP_GAP))){
+            if ( selectedNode.lpRelaxValueMinimization>=(incumbent*(ONE ))){
                 //discard
             } else if (selectedNode.lpRelaxValueMinimization<bestLPAmongAllInfeasibleRectangles) {
                 //this Lp vertex is a feasible solution

@@ -27,7 +27,9 @@ public   class Rectangle {
     public List <String> lpVertex_zeroFixedVariables = new ArrayList <String>();
     public List <String> lpVertex_oneFixedVariables  = new ArrayList <String>();
     
-    
+    public double lpRelaxValue_Max_imization;     
+    public List <String> max_lpVertex_zeroFixedVariables = new ArrayList <String>();
+    public List <String> max_lpVertex_oneFixedVariables  = new ArrayList <String>();
          
     private static Logger logger=Logger.getLogger(Rectangle.class);
         
@@ -59,6 +61,36 @@ public   class Rectangle {
     public int getDepth () {
         return this.zeroFixedVariables.size()+this.oneFixedVariables.size();
     }
+    
+    //get min possible value
+    public double getLpRelaxVertex_Max_imization () {
+        
+        this.lpRelaxValue_Max_imization = ZERO;
+        this.max_lpVertex_oneFixedVariables.clear();
+        this.max_lpVertex_zeroFixedVariables.clear();
+        
+        for (VariableCoefficientTuple tuple: BNBR_Driver.objective.objectiveExpr){
+            if (this.oneFixedVariables.contains(tuple.varName) ){
+                this. lpRelaxValue_Max_imization+=tuple.coeff;
+                max_lpVertex_oneFixedVariables.add(tuple.varName) ;
+            }else if (this.zeroFixedVariables.contains(tuple.varName)) {
+                max_lpVertex_zeroFixedVariables.add(tuple.varName);
+            }
+            
+            if (!this.oneFixedVariables.contains(tuple.varName) && !this.zeroFixedVariables.contains(tuple.varName)   ){
+                //free var
+                if (tuple.coeff>ZERO) {
+                    this.lpRelaxValue_Max_imization+=tuple.coeff;
+                    max_lpVertex_oneFixedVariables.add(tuple.varName) ;
+                }else {
+                    max_lpVertex_zeroFixedVariables.add(tuple.varName);
+                }
+            }
+        }
+        
+        return lpRelaxValue_Max_imization;
+    }
+    
     
     //get min possible value
     public double getLpRelaxVertex_Minimization () {
@@ -117,5 +149,7 @@ public   class Rectangle {
         return variablesUsedForBranchingInThisRectangle;
     }
 
+    
+    
 }
 

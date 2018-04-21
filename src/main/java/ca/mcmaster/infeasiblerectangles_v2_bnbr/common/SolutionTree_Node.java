@@ -135,19 +135,22 @@ public class SolutionTree_Node extends Rectangle{
                 //System.out.println(" will not replenish");
                 continue ;// do not replenish
             }  
-              
-            System.err.println(" replenishRectangles for " +constraintNumber) ;
                          
             Analytic_RectangleCollector rectangleCollector = new  Analytic_RectangleCollector (this,BNBR_Driver.mipConstraintList.get(constraintNumber) );
             boolean allCollected = rectangleCollector.collect( RECTS_TO_BE_COLLECTED_PER_CONSTRAINT);
             //add all the new rects , if any, to the existing map for this constraint
+            int numRectsCollected = ZERO;
             for(Map.Entry<Double, List<Rectangle>> entry : rectangleCollector.collectedFeasibleRectangles.entrySet()){
                 //add into rectMap
                 List<Rectangle> currentList = rectMap.get( entry.getKey());
                 if (null==currentList)  currentList = new ArrayList<Rectangle> ();
                 currentList.addAll( entry.getValue());
                 rectMap.put( entry.getKey(), currentList);
+                numRectsCollected+=entry.getValue().size();
             }
+            
+            System.err.println(" replenished Rectangles for " +constraintNumber + " count " +numRectsCollected ) ;
+            
             areAllRectsCollectedForThisConstraint.set(constraintNumber , allCollected);
             if (!allCollected) {
                 // System.out.println(" not all collected for "+BNBR_Driver.mipConstraintList.get(constraintNumber).name) ;

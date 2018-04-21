@@ -11,8 +11,7 @@ import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Constants.LOG_FILE_EXTENS
 import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Constants.LOG_FOLDER;
 import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Constants.ONE;
 import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Constants.TEN;
-import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Constants.ZERO;
-import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Parameters.ENUM_SOLVER_MIP_GAP;
+import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Constants.ZERO; 
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.common.LowerBoundConstraint;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.common.Rectangle;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.common.SolutionTree_Node;
@@ -100,7 +99,7 @@ public class Conflict_Solver_SBF {
             
             //this node can be a solution , require branching, or get cutoff by the incumbent
             double bestLPAmongAllInfeasibleRectangles = selectedNode.getBestLPAmongAllInfeasibleRectangles();            
-            if ( selectedNode.lpRelaxValueMinimization>=incumbent*(ONE +ENUM_SOLVER_MIP_GAP)){
+            if ( selectedNode.lpRelaxValueMinimization>=incumbent*(ONE )){
                 //discard
             } else if (selectedNode.lpRelaxValueMinimization<bestLPAmongAllInfeasibleRectangles) {
                 //this Lp vertex is a feasible solution

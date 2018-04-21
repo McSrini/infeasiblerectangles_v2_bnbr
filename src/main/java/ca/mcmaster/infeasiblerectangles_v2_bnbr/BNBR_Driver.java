@@ -17,7 +17,7 @@ import ca.mcmaster.infeasiblerectangles_v2_bnbr.common.Objective;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.analytic.BNBR_Solver;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.analytic.BN_LowestRef_Solver;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.analytic.Conflict_Solver;
-import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.analytic.Conflict_Solver_SBF;
+import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.analytic.Conflict_Solver_SBF; 
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.analytic.Enum_Solver;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.analytic.bucket.BucketSolver;
 import ilog.concert.IloException;
@@ -105,7 +105,7 @@ public class BNBR_Driver {
         //Enum_Solver solver = new Enum_Solver () ;
         //BN_LowestRef_Solver solver = new BN_LowestRef_Solver ();
         //BucketSolver solver = new BucketSolver();
-        Conflict_Solver_SBF solver = new Conflict_Solver_SBF() ;
+        Conflict_Solver solver = new Conflict_Solver  () ;
         solver.solve();
         System.out.println("The MIP incumbent is = " +solver.incumbent) ;
         

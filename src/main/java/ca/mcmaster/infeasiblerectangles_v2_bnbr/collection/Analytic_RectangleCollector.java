@@ -59,8 +59,6 @@ public class Analytic_RectangleCollector {
             System.err.println("Exit: unable to initialize logging");       
             exit(1);
         }
-        
-        
     }
     
     public Analytic_RectangleCollector (SolutionTree_Node leaf, LowerBoundConstraint lbc){
@@ -254,6 +252,10 @@ public class Analytic_RectangleCollector {
         if (rects==null) rects =new ArrayList<Rectangle> ();
         rects.add(leafNode) ;
         collectedFeasibleRectangles.put( leafNode.lpRelaxValueMinimization, rects);
+        
+        //this is used by some solvers
+        leafNode.getLpRelaxVertex_Max_imization();
+        
     }
     
     private void addPendingJobs (List<Rectangle> jobs) {
