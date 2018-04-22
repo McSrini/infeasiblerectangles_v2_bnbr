@@ -21,8 +21,8 @@ public class RectangleCollectionSplitter {
     //map to be split
     private TreeMap<Double, List<Rectangle>  > input_Rectangle_Set=null;
     
-    public TreeMap<Double, List<Rectangle>  > rectangle_Compatible_With_Zero_Side = new TreeMap <Double, List<Rectangle>>  ();    
-    public TreeMap<Double, List<Rectangle>  > rectangle_Compatible_With_One_Side = new TreeMap <Double, List<Rectangle>>  ();    
+    public TreeMap<Double, List<Rectangle>  > rectangles_Compatible_With_Zero_Side = new TreeMap <Double, List<Rectangle>>  ();    
+    public TreeMap<Double, List<Rectangle>  > rectangles_Compatible_With_One_Side = new TreeMap <Double, List<Rectangle>>  ();    
     
     public boolean isZeroSideInfeasible = false;
     public boolean isOneSideInfeasible = false;
@@ -67,12 +67,12 @@ public class RectangleCollectionSplitter {
                     }  */                   
                 }                 
             }
-            if (zeroRects.size()>ZERO && !isZeroSideInfeasible) rectangle_Compatible_With_Zero_Side.put( entry.getKey(), zeroRects );
-            if (oneRects.size()>ZERO && !isOneSideInfeasible) rectangle_Compatible_With_One_Side.put (entry.getKey(), oneRects);
+            if (zeroRects.size()>ZERO && !isZeroSideInfeasible) rectangles_Compatible_With_Zero_Side.put( entry.getKey(), zeroRects );
+            if (oneRects.size()>ZERO && !isOneSideInfeasible) rectangles_Compatible_With_One_Side.put (entry.getKey(), oneRects);
         }  
         
-        if (isZeroSideInfeasible) rectangle_Compatible_With_Zero_Side.clear();
-        if (isOneSideInfeasible)  rectangle_Compatible_With_One_Side.clear();
+        if (isZeroSideInfeasible) rectangles_Compatible_With_Zero_Side.clear();
+        if (isOneSideInfeasible)  rectangles_Compatible_With_One_Side.clear();
             
     }
     

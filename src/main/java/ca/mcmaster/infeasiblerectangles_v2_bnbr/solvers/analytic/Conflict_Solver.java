@@ -276,10 +276,10 @@ public class Conflict_Solver {
 
             //if a side is feasible , update its rectangle collection, otherwise do not bother
             if (isZeroChildFeasible) {
-                zeroChild.setInfeasibleRectangles (constraintNumber, splitter.rectangle_Compatible_With_Zero_Side) ;
+                zeroChild.setInfeasibleRectangles (constraintNumber, splitter.rectangles_Compatible_With_Zero_Side) ;
             }
             if (isOneChildFeasible) {
-                oneChild.setInfeasibleRectangles (constraintNumber, splitter.rectangle_Compatible_With_One_Side) ;
+                oneChild.setInfeasibleRectangles (constraintNumber, splitter.rectangles_Compatible_With_One_Side) ;
             }  
             
         }//end for all constraints, update infeasible rects for each child node

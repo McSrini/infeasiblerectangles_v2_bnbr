@@ -20,6 +20,8 @@ import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.analytic.Conflict_Solver
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.analytic.Conflict_Solver_SBF; 
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.analytic.Enum_Solver;
 import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.analytic.bucket.BucketSolver;
+import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.cplex.Cplex_Solver;
+import ca.mcmaster.infeasiblerectangles_v2_bnbr.solvers.cplex.Cplex_Solver_Central;
 import ilog.concert.IloException;
 import ilog.concert.IloLPMatrix;
 import ilog.concert.IloLinearNumExpr;
@@ -105,9 +107,10 @@ public class BNBR_Driver {
         //Enum_Solver solver = new Enum_Solver () ;
         //BN_LowestRef_Solver solver = new BN_LowestRef_Solver ();
         //BucketSolver solver = new BucketSolver();
-        Conflict_Solver solver = new Conflict_Solver  () ;
+       // Conflict_Solver solver = new Conflict_Solver  () ;
+        Cplex_Solver_Central solver = new Cplex_Solver_Central  () ;
         solver.solve();
-        System.out.println("The MIP incumbent is = " +solver.incumbent) ;
+        System.out.println("The MIP incumbent is = " /*+solver.incumbent*/) ;
         
     }//end main
     

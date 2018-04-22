@@ -9,8 +9,7 @@ import ca.mcmaster.infeasiblerectangles_v2_bnbr.BNBR_Driver;
 import static ca.mcmaster.infeasiblerectangles_v2_bnbr.Constants.*;
 import static java.lang.System.exit;
 import java.util.ArrayList;
-import java.util.List;
-import org.apache.log4j.*;
+import java.util.List; 
  
 
 /**
@@ -31,9 +30,9 @@ public   class Rectangle {
     public List <String> max_lpVertex_zeroFixedVariables = new ArrayList <String>();
     public List <String> max_lpVertex_oneFixedVariables  = new ArrayList <String>();
          
-    private static Logger logger=Logger.getLogger(Rectangle.class);
+    //private static Logger logger=Logger.getLogger(Rectangle.class);
         
-    static {
+    /*static {
                     
         logger=Logger.getLogger(Rectangle.class);
         logger.setLevel(Level.DEBUG);
@@ -50,7 +49,7 @@ public   class Rectangle {
             System.err.println("Exit: unable to initialize logging");        
             exit(1);
         }
-    }
+    }*/
     
     public Rectangle (List <String> zeroFixedVariables , List <String> oneFixedVariables ){
         this.zeroFixedVariables .addAll(zeroFixedVariables);
